@@ -1,0 +1,6 @@
+{
+  "name": "ATOMIC — International Remote Job Discovery & Career Intelligence",
+  "description": "AI-powered international remote job discovery, eligibility verification for Nigerian applicants, transparent 100-point skill matching, and tailored application intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
