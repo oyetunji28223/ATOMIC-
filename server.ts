@@ -18,6 +18,15 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    service: 'atomic-career-platform',
+    aiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Initialize Google GenAI on server only
 const apiKey = process.env.GEMINI_API_KEY || '';
 const ai = new GoogleGenAI({
@@ -405,14 +414,21 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    // In production the server is bundled into dist/server.mjs, so __dirname
+    // already points at the Vite output directory.
+    const staticDir = __dirname;
+    app.use('/api', (_req, res) => {
+      res.status(404).json({ error: 'API endpoint not found' });
+    });
+    app.use(express.static(staticDir));
     app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.join(staticDir, 'index.html'));
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`ATOMIC Career Platform Server running on port ${PORT}`);
+  const host = process.env.HOST || '0.0.0.0';
+  app.listen(PORT, host, () => {
+    console.log(`ATOMIC Career Platform Server running on ${host}:${PORT}`);
   });
 }
 
